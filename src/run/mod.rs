@@ -3,7 +3,6 @@ use std::{ffi::CString, ptr};
 
 use nwg::CheckBoxState;
 use winapi::um::shellapi::ShellExecuteA;
-use CreateProcessW::Command;
 extern crate native_windows_gui as nwg;
 
 
@@ -73,37 +72,27 @@ pub fn create_run_window(){
     
     let handler = nwg::full_bind_event_handler(&run_window.handle, move |evt, _evt_data, handle| {
         if evt == nwg::Event::OnButtonClick && handle == button.handle {
+            let mut types = CString::new("open").expect("Failed to convert to CString");
             if admincheck.check_state() == CheckBoxState::Checked {
-                let text = inputbox.text();
-                let vecc: Vec<&str> = text.split_whitespace().collect();
-                let types = CString::new("runas").expect("Failed to convert to CString");
-                let command = CString::new(vecc[0]).expect("Failed to convert to CString");
-                let args = CString::new(vecc[1..].join(" ")).expect("Failed To Convert To CString");    
-                unsafe {
-                    ShellExecuteA(
-                        ptr::null_mut(),
-                        types.as_ptr(),
-                        command.as_ptr(),
-                        args.as_ptr(),
-                        ptr::null_mut(),
-                        5
-                )};
-            } else {
-                let command = Command::new(inputbox.text()).spawn();
-                match command {
-                    Ok(_) => {
-                    }
-                    Err(_) => {
-                        nwg::simple_message("Error", "Couldn't Create Process");
-                    }
-                }
-            } 
+                types = CString::new("runas").expect("Failed to convert to CString");
+            }
+            let text = inputbox.text();
+            let vecc: Vec<&str> = text.split_whitespace().collect();
+            let command = CString::new(vecc[0]).expect("Failed to convert to CString");
+            let args = CString::new(vecc[1..].join(" ")).expect("Failed To Convert To CString");    
+            unsafe {
+                ShellExecuteA(
+                    ptr::null_mut(),
+                    types.as_ptr(),
+                    command.as_ptr(),
+                    args.as_ptr(),
+                    ptr::null_mut(),
+                    5
+            )};
         }
-    });
-    
+    });  
     nwg::dispatch_thread_events();
     nwg::unbind_event_handler(&handler); 
-
 }
 
 
