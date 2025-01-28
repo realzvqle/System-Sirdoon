@@ -7,10 +7,16 @@ extern crate native_windows_gui as nwg;
 
 
 pub fn create_run_window(){
+    let mut icon = nwg::Icon::default();
+    nwg::Icon::builder()
+        .source_file(Some("assets/run.ico"))
+        .build(&mut icon)
+        .expect("Failure");
     let mut run_window = nwg::Window::default();
     nwg::Window::builder()
         .size((400, 170))
         .title("Run")
+        .icon(Some(&icon))
         .build(&mut run_window)
         .expect("Error Creating the Run Window");
     let mut font = nwg::Font::default();

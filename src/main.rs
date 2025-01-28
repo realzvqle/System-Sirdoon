@@ -15,13 +15,20 @@ extern crate native_windows_gui as nwg;
 fn main(){
     presetup::give_power_permissions();
     nwg::init().expect("Error");
-
+    let mut icon = nwg::Icon::default();
+    nwg::Icon::builder()
+        .source_file(Some("assets/sirdoon.ico"))
+        .build(&mut icon)
+        .expect("Failure");
     let mut window = nwg::Window::default();
     nwg::Window::builder()
         .size((800, 700))
         .title("System Sirdoon")
+        .icon(Some(&icon))
         .build(&mut window)
         .expect("Error with the Window");
+    
+
     let mut font = nwg::Font::default();
     nwg::Font::builder()
         .family("Microsoft JhengHei Light")

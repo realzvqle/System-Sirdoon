@@ -1,2 +1,30 @@
 #define RT_MANIFEST 24
 1 RT_MANIFEST "sirdoon.exe.manifest"
+
+1 ICON "assets/sirdoon.ico"
+
+1 VERSIONINFO
+FILEVERSION 0,0,0,0
+PRODUCTVERSION -,0,0,0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName",      "zvqle"
+            VALUE "FileDescription",  "System Sirdoon"
+            VALUE "FileVersion",      "0, 0, 0, 0"
+            VALUE "InternalName",     "Sirdoon"
+            VALUE "LegalCopyright",   "Copyright 2025 zvqle. All rights Reserved."
+            VALUE "OriginalFilename", "sirdoon.exe"
+            VALUE "ProductName",      "System Sirdoom"
+            VALUE "ProductVersion",   "0, 0, 0, 0"
+            VALUE "LegalTrademarks",  "zvqle"
+            VALUE "Comments",         "Intellegence"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END
