@@ -260,6 +260,7 @@ dependencies = [
  "CreateProcessW",
  "embed-resource",
  "native-windows-gui",
+ "winapi",
  "winres",
 ]
 

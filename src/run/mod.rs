@@ -1,10 +1,11 @@
-use std::{process, sync::{Arc, Mutex}};
 
-use nwg::{Window, WindowFlags};
+use std::{ffi::CString, ptr};
+
+use nwg::CheckBoxState;
+use winapi::um::shellapi::ShellExecuteA;
 use CreateProcessW::Command;
 extern crate native_windows_gui as nwg;
 
-static mut SHOULD_EXIT: bool = false;
 
 pub fn create_run_window(){
     let mut run_window = nwg::Window::default();
@@ -60,17 +61,43 @@ pub fn create_run_window(){
 
     inputbox.set_focus();
 
+    let mut admincheck = nwg::CheckBox::default();
+    nwg::CheckBox::builder()
+        .parent(&run_window)
+        .text("Run As Administrator")
+        .size((250, 21))
+        .font(Some(&font))
+        .position((10, 75))
+        .build(&mut admincheck)
+        .expect("error");
     
     let handler = nwg::full_bind_event_handler(&run_window.handle, move |evt, _evt_data, handle| {
         if evt == nwg::Event::OnButtonClick && handle == button.handle {
-            let command = Command::new(inputbox.text()).spawn();
-            match command {
-                Ok(_) => {
+            if admincheck.check_state() == CheckBoxState::Checked {
+                let text = inputbox.text();
+                let vecc: Vec<&str> = text.split_whitespace().collect();
+                let types = CString::new("runas").expect("Failed to convert to CString");
+                let command = CString::new(vecc[0]).expect("Failed to convert to CString");
+                let args = CString::new(vecc[1..].join(" ")).expect("Failed To Convert To CString");    
+                unsafe {
+                    ShellExecuteA(
+                        ptr::null_mut(),
+                        types.as_ptr(),
+                        command.as_ptr(),
+                        args.as_ptr(),
+                        ptr::null_mut(),
+                        5
+                )};
+            } else {
+                let command = Command::new(inputbox.text()).spawn();
+                match command {
+                    Ok(_) => {
+                    }
+                    Err(_) => {
+                        nwg::simple_message("Error", "Couldn't Create Process");
+                    }
                 }
-                Err(_) => {
-                    nwg::simple_message("Error", "Couldn't Create Process");
-                }
-            }
+            } 
         }
     });
     
@@ -78,3 +105,6 @@ pub fn create_run_window(){
     nwg::unbind_event_handler(&handler); 
 
 }
+
+
+

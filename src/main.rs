@@ -13,7 +13,7 @@ fn main(){
 
     let mut window = nwg::Window::default();
     nwg::Window::builder()
-        .size((900, 940))
+        .size((800, 700))
         .title("System Sirdoon")
         .build(&mut window)
         .expect("Error with the Window");

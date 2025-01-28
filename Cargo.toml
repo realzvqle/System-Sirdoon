@@ -12,6 +12,7 @@ panic = "abort"
 [dependencies]
 CreateProcessW = "0.1.4"
 native-windows-gui = "1.0.13"
+winapi = "0.3.9"
 winres = "0.1.12"
 
 
