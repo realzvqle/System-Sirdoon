@@ -9,7 +9,7 @@ extern crate native_windows_gui as nwg;
 pub fn create_run_window(){
     let mut run_window = nwg::Window::default();
     nwg::Window::builder()
-        .size((400, 150))
+        .size((400, 170))
         .title("Run")
         .build(&mut run_window)
         .expect("Error Creating the Run Window");
@@ -44,7 +44,7 @@ pub fn create_run_window(){
         .parent(&run_window)
         .size((70, 30))
         .text("Run")
-        .position((10, 100))
+        .position((10, 130))
         .font(Some(&font))
         .build(&mut button)
         .expect("bad");
@@ -69,15 +69,30 @@ pub fn create_run_window(){
         .position((10, 75))
         .build(&mut admincheck)
         .expect("error");
-    
+    let mut trustedinstacheck = nwg::CheckBox::default();
+    nwg::CheckBox::builder()
+        .parent(&run_window)
+        .text("Run As TrustedInstaller")
+        .size((250, 21))
+        .font(Some(&font))
+        .position((10, 100))
+        .build(&mut trustedinstacheck)
+        .expect("error");
     let handler = nwg::full_bind_event_handler(&run_window.handle, move |evt, _evt_data, handle| {
         if evt == nwg::Event::OnButtonClick && handle == button.handle {
+            if trustedinstacheck.check_state() == CheckBoxState::Checked {
+                nwg::simple_message("System Sirdoon", "Coming Soon!!"); 
+                return
+            }
             let mut types = CString::new("open").expect("Failed to convert to CString");
             if admincheck.check_state() == CheckBoxState::Checked {
                 types = CString::new("runas").expect("Failed to convert to CString");
             }
             let text = inputbox.text();
             let vecc: Vec<&str> = text.split_whitespace().collect();
+            if vecc.len() <= 1 {
+                return
+            }
             let command = CString::new(vecc[0]).expect("Failed to convert to CString");
             let args = CString::new(vecc[1..].join(" ")).expect("Failed To Convert To CString");    
             unsafe {
