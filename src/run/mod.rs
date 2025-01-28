@@ -96,7 +96,7 @@ pub fn create_run_window(){
             }
             let text = inputbox.text();
             let mut vecc: Vec<&str> = text.split_whitespace().collect();
-            if vecc.len() <= 1 {
+            if vecc.len() <= 0 {
                 vecc.push("explorer");
             }
             let command = CString::new(vecc[0]).expect("Failed to convert to CString");
