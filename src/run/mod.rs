@@ -80,8 +80,8 @@ pub fn create_run_window(){
         .expect("error");
     let handler = nwg::full_bind_event_handler(&run_window.handle, move |evt, _evt_data, handle| {
         if evt == nwg::Event::OnButtonClick && handle == button.handle {
-            if trustedinstacheck.check_state() == CheckBoxState::Checked {
-                nwg::simple_message("System Sirdoon", "Coming Soon!!"); 
+            if trustedinstacheck.check_state() == CheckBoxState::Checked{
+                nwg::simple_message("System Sirdoon", "Coming Soon!");
                 return
             }
             let mut types = CString::new("open").expect("Failed to convert to CString");
@@ -89,9 +89,9 @@ pub fn create_run_window(){
                 types = CString::new("runas").expect("Failed to convert to CString");
             }
             let text = inputbox.text();
-            let vecc: Vec<&str> = text.split_whitespace().collect();
+            let mut vecc: Vec<&str> = text.split_whitespace().collect();
             if vecc.len() <= 1 {
-                return
+                vecc.push("explorer");
             }
             let command = CString::new(vecc[0]).expect("Failed to convert to CString");
             let args = CString::new(vecc[1..].join(" ")).expect("Failed To Convert To CString");    

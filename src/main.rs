@@ -3,12 +3,16 @@
 
 use std::process;
 
+use winapi::um::{powrprof::SetSuspendState, reason::SHTDN_REASON_MAJOR_SYSTEM, winuser::{ExitWindowsEx, EWX_REBOOT, EWX_SHUTDOWN}};
+
 
 
 mod run;
+mod presetup;
 extern crate native_windows_gui as nwg;
 
 fn main(){
+    presetup::give_power_permissions();
     nwg::init().expect("Error");
 
     let mut window = nwg::Window::default();
@@ -25,21 +29,52 @@ fn main(){
         .build(&mut font)
         .expect("Failed to create font");
 
-    let mut menu = nwg::Menu::default();
+    let mut sysmenu = nwg::Menu::default();
     nwg::Menu::builder()
         .parent(&window)
         .text("System")
-        .build(&mut menu)
+        .build(&mut sysmenu)
         .expect("Bad");
-
     let mut run = nwg::MenuItem::default();
     nwg::MenuItem::builder()
-        .parent(&menu)
+        .parent(&sysmenu)
         .text("Run")
         .build(&mut run)
         .expect("Bad");
-    
-    
+
+    let mut powermenu = nwg::Menu::default();
+    nwg::Menu::builder()
+        .parent(&window)
+        .text("Power")
+        .build(&mut powermenu)
+        .expect("Bad");
+    let mut shutdown: nwg::MenuItem = nwg::MenuItem::default();
+    nwg::MenuItem::builder()
+        .parent(&powermenu)
+        .text("Shutdown")
+        .build(&mut shutdown)
+        .expect("Bad");
+
+    let mut restart: nwg::MenuItem = nwg::MenuItem::default();
+    nwg::MenuItem::builder()
+        .parent(&powermenu)
+        .text("Restart")
+        .build(&mut restart)
+        .expect("Bad");
+
+    let mut suspend: nwg::MenuItem = nwg::MenuItem::default();
+    nwg::MenuItem::builder()
+        .parent(&powermenu)
+        .text("Suspend")
+        .build(&mut suspend)
+        .expect("Bad");
+
+    let mut hibernate: nwg::MenuItem = nwg::MenuItem::default();
+    nwg::MenuItem::builder()
+        .parent(&powermenu)
+        .text("Hibernate")
+        .build(&mut hibernate)
+        .expect("Bad");
     
 
     let handler = nwg::full_bind_event_handler(&window.handle, move |evt, _evt_data, handle| {
@@ -50,6 +85,35 @@ fn main(){
             if handle == run.handle {
                 run::create_run_window();
             }
+            if handle == shutdown.handle {
+                let status = unsafe{ExitWindowsEx(EWX_SHUTDOWN, SHTDN_REASON_MAJOR_SYSTEM)};
+                if status == 0 {
+                    nwg::simple_message("System Sirdoon","Failed Shutting Down The Machine");
+                    return;
+                }
+            }
+            if handle == restart.handle {
+                let status = unsafe{ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_SYSTEM)};
+                if status == 0 {
+                    nwg::simple_message("System Sirdoon","Failed Restarting The Machine");
+                    return;
+                }
+            }
+            if handle == suspend.handle {
+                let status = unsafe{SetSuspendState(0, 1, 0)};
+                if status == 0 {
+                    nwg::simple_message("System Sirdoon","Failed Suspending The Machine");
+                    return;
+                }
+            }
+            if handle == hibernate.handle {
+                let status = unsafe{SetSuspendState(1, 1, 0)};
+                if status == 0 {
+                    nwg::simple_message("System Sirdoon","Failed Suspending The Machine");
+                    return;
+                }
+            }
+            
         }
     });
     nwg::dispatch_thread_events();
