@@ -3,7 +3,8 @@
 
 use std::process;
 
-use winapi::um::{powrprof::SetSuspendState, reason::SHTDN_REASON_MAJOR_SYSTEM, winuser::{ExitWindowsEx, EWX_REBOOT, EWX_SHUTDOWN}};
+use phnt::ffi::NtShutdownSystem;
+use winapi::{shared::ntdef::NT_SUCCESS, um::{powrprof::SetSuspendState, reason::SHTDN_REASON_MAJOR_SYSTEM, winuser::{ExitWindowsEx, EWX_REBOOT, EWX_SHUTDOWN}}};
 
 
 
@@ -48,19 +49,49 @@ fn main(){
         .text("Power")
         .build(&mut powermenu)
         .expect("Bad");
-    let mut shutdown: nwg::MenuItem = nwg::MenuItem::default();
-    nwg::MenuItem::builder()
+
+    let mut shutdown: nwg::Menu = nwg::Menu::default();
+    nwg::Menu::builder()
         .parent(&powermenu)
         .text("Shutdown")
         .build(&mut shutdown)
         .expect("Bad");
 
-    let mut restart: nwg::MenuItem = nwg::MenuItem::default();
-    nwg::MenuItem::builder()
+    let mut restart: nwg::Menu = nwg::Menu::default();
+    nwg::Menu::builder()
         .parent(&powermenu)
         .text("Restart")
         .build(&mut restart)
         .expect("Bad");
+
+    let mut normalshutdown: nwg::MenuItem = nwg::MenuItem::default();
+    nwg::MenuItem::builder()
+        .parent(&shutdown)
+        .text("Normal")
+        .build(&mut normalshutdown)
+        .expect("Bad");
+
+    let mut forceshutdown: nwg::MenuItem = nwg::MenuItem::default();
+    nwg::MenuItem::builder()
+        .parent(&shutdown)
+        .text("Force")
+        .build(&mut forceshutdown)
+        .expect("Bad");
+
+    let mut normalrestart: nwg::MenuItem = nwg::MenuItem::default();
+    nwg::MenuItem::builder()
+        .parent(&restart)
+        .text("Normal")
+        .build(&mut normalrestart)
+        .expect("Bad");
+
+    let mut forcerestart: nwg::MenuItem = nwg::MenuItem::default();
+    nwg::MenuItem::builder()
+        .parent(&restart)
+        .text("Force")
+        .build(&mut forcerestart)
+        .expect("Bad");
+
 
     let mut suspend: nwg::MenuItem = nwg::MenuItem::default();
     nwg::MenuItem::builder()
@@ -85,18 +116,37 @@ fn main(){
             if handle == run.handle {
                 run::create_run_window();
             }
-            if handle == shutdown.handle {
+            if handle == normalshutdown.handle {
                 let status = unsafe{ExitWindowsEx(EWX_SHUTDOWN, SHTDN_REASON_MAJOR_SYSTEM)};
                 if status == 0 {
                     nwg::simple_message("System Sirdoon","Failed Shutting Down The Machine");
                     return;
                 }
             }
-            if handle == restart.handle {
+            if handle == normalrestart.handle {
                 let status = unsafe{ExitWindowsEx(EWX_REBOOT, SHTDN_REASON_MAJOR_SYSTEM)};
                 if status == 0 {
                     nwg::simple_message("System Sirdoon","Failed Restarting The Machine");
                     return;
+                }
+            }
+
+            if handle == forceshutdown.handle {
+                unsafe {
+                    let status = NtShutdownSystem(phnt::ffi::SHUTDOWN_ACTION::ShutdownPowerOff);
+                    if !NT_SUCCESS(status) {
+                        nwg::simple_message("System Sirdoon", "Failed Shutting Down The Machine");
+                        return;
+                    }
+                }
+            }
+            if handle == forcerestart.handle {
+                unsafe {
+                    let status = NtShutdownSystem(phnt::ffi::SHUTDOWN_ACTION::ShutdownReboot);
+                    if !NT_SUCCESS(status) {
+                        nwg::simple_message("System Sirdoon", "Failed Restarting The Machine");
+                        return;
+                    }
                 }
             }
             if handle == suspend.handle {
@@ -125,23 +175,3 @@ fn main(){
 
 
 
-// let mut input = nwg::TextInput::default();
-    // nwg::TextInput::builder()
-    //     .parent(&window)
-    //     .size((400, 300))
-    //     .text("Enter Something")
-    //     .position((100, 400))
-    //     .font(Some(&font))
-    //     .build(&mut input)
-    //     .expect("Bad");
-
-
-//let mut button = nwg::Button::default();
-    // nwg::Button::builder()
-    //     .parent(&window)
-    //     .size((100, 100))
-    //     .text("Hi")
-    //     .position((100, 100))
-    //     .font(Some(&font))
-    //     .build(&mut button)
-    //     .expect("bad");

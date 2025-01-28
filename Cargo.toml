@@ -12,6 +12,7 @@ panic = "abort"
 [dependencies]
 CreateProcessW = "0.1.4"
 native-windows-gui = "1.0.13"
+phnt = "0.1.2"
 winapi = { version = "0.3.9", features = ["winuser", "winbase", "handleapi", "processthreadsapi", "synchapi", "shellapi", "winreg", "ntsecapi", "securitybaseapi", "powrprof"] }
 winres = "0.1.12"
 
